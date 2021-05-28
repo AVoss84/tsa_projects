@@ -78,7 +78,6 @@ class BayesOCPD(BaseEstimator, OutlierMixin):
         lab[self.score(X)] = -1
         return lab
 
-    def score(self, X):
-        #return np.amax(self.R, 1)    
+    def score(self, X):    
         cps_est = np.where((self.cps_MAP[1:] - self.cps_MAP[:-1]) < -self.mini_run_length)[0]    # MAP estimates of change points
         return cps_est
