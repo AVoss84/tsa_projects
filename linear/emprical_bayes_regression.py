@@ -1,5 +1,5 @@
 import numpy as np
-from prml.linear.bayesian_regression import BayesianRegression
+from linear.bayesian_regression import BayesianRegression
 
 
 class EmpiricalBayesRegression(BayesianRegression):
