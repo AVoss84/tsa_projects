@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 
+
 def embed(data : pd.DataFrame, lags : int, dropnan=True):
   df = pd.DataFrame(data) 
   colnames = data.columns
@@ -15,7 +16,7 @@ def embed(data : pd.DataFrame, lags : int, dropnan=True):
   agg.columns = names  
   if dropnan:
     agg.dropna(inplace=True)              	# drop rows with NaN values
-  return(agg)  
+  return agg
 
 
 def series_to_supervised(data, n_in=1, n_out=1, dropnan=True):
@@ -51,21 +52,27 @@ def series_to_supervised(data, n_in=1, n_out=1, dropnan=True):
 		agg.dropna(inplace=True)
 	return agg
 
+def logsumexp(x):
+    """Log-Sum-Exp Trick"""
+    c = x.max()
+    return c + np.log(np.sum(np.exp(x - c)))
+
 
 def indBrkL(k : np.array):
-    """
-	Break indicator matrices for drift/trend breaks
-	"""
-    k[0] = 0
-    nofb = len(k) - 2    # substract start and end date
-	tim = np.array(range(k[len(k)-1]))
-	ei1 = np.zeros((k[len(k)-1], len(k) - 1))    # drift
-	ei2 = np.zeros((k[len(k)-1], len(k) - 1))    # trend
-	i = 1
-	while i < len(k):
-		ei1[:, i - 1] = (k[i - 1] <= tim) & (tim < k[i])     # drift break
-		ei2[:, i - 1] = ei1[:, i - 1] * tim     # trend break
-		i += 1
-	drift = pd.DataFrame(ei1, columns=['Drift_'+str(s) for s in range(nofb+1)])	
-	trend = pd.DataFrame(ei2, columns=['Trend_'+str(s) for s in range(nofb+1)])	
-	return	dict(ei=np.concatenate((ei1,ei2), axis=1), ei1=ei1)
+  """
+  Break indicator matrices for drift/trend breaks
+  """
+  k[0] = 0.
+  nofb = len(k) - 2    # substract start and end date
+  tim = np.array(range(int(k[len(k)-1])))
+  ei1 = np.zeros((int(k[len(k)-1]), len(k) - 1))    # drift
+  ei2 = np.zeros((int(k[len(k)-1]), len(k) - 1))    # trend
+  i = 1
+  while i < len(k):
+	  ei1[:, i - 1] = (k[i - 1] <= tim) & (tim < k[i])     # drift break
+	  ei2[:, i - 1] = ei1[:, i - 1] * tim     # trend break
+	  i += 1
+  #drift = pd.DataFrame(ei1, columns=['Drift_'+str(s) for s in range(nofb+1)])	
+  #trend = pd.DataFrame(ei2, columns=['Trend_'+str(s) for s in range(nofb+1)])	
+  return dict(ei=np.concatenate((ei1,ei2), axis=1), ei1=ei1)
+
