@@ -1,4 +1,4 @@
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 #from mpl_toolkits.mplot3d import Axes3D
 #from scipy.stats import wishart, multivariate_normal, bernoulli, multinomial
 #from scipy.sparse import csr_matrix
@@ -19,8 +19,7 @@ import pandas as pd
 #from itertools import chain, combinations
 import tsa_utils as utils
 
-#from test import bayesian_regression as bayes
-from test import variational_linear_regression as bayes
+from bayes_regression import variational_linear_regression as bayes
 
 reload(utils)
 

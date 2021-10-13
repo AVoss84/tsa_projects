@@ -1,4 +1,4 @@
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 #from mpl_toolkits.mplot3d import Axes3D
 #from scipy.stats import wishart, multivariate_normal, bernoulli, multinomial
 #from scipy.sparse import csr_matrix
@@ -16,9 +16,11 @@ import pandas as pd
 import time
 #from scipy.spatial.distance import euclidean
 import itertools
-from itertools import chain, combinations
+#from itertools import chain, combinations
 import tsa_utils as utils
+import gibbs_break as gibbs
 
+reload(gibbs)
 reload(utils)
 
 
@@ -39,8 +41,8 @@ phi_true = 0.77
 sigma_true = 0.5
 
 N1 = 5*10**1
-N2 = 5*10**1
-N3 = 5*10**1
+N2 = 3*10**1
+N3 = 3*10**1
 
 omega = 1
 phi_true = 0.77
@@ -48,19 +50,26 @@ sigma_true = 0.5
 
 cps = [N1+1]
 
-#cps = [N1+1, N1+N2+1]
+cps = [N1+1, N1+N2+1]
 
 y1 = simAR1(N1, phi = phi_true, sigma = sigma_true, const = 0)    # Regime 1
 y2 = simAR1(N2, phi = .4*phi_true, sigma = sigma_true, const = 1.5)    # Regime 2
 y3 = simAR1(N3, phi = phi_true, sigma = 0.9*sigma_true, const = 0.2)    # Regime 2
 
-y = np.concatenate((y1, y2),axis=0)              # data with level shift
+y = np.concatenate((y1, y2, y3),axis=0)              # data with level shift
 cps
+#------------------------------------------------------------------------------------------
 
+# Run:
+bd =  gibbs.zivot(y, burn=100, gibbs=1000, nofb = 2)
+bd.mean(axis=0)
+
+
+"""
 n = len(y)
 burn = 300
 gibbs = 2000
-nofb = 2
+nofb = 3
 r = 1
 nNew = n-r
 fixbreaks = None
@@ -86,11 +95,12 @@ tau = 3
 
 reload(utils)
 
+
 # Initialisations:
-#-------------------#
+#-------------------
 # Specify the hyperparameters:
 # Multivariate Normal prior for beta ("B")
-#-----------------------------------------#
+#------------------------------------------
 a0 = np.zeros((2*nofb+2+r,1)) 		     #mean of betas
 siga = np.eye(2*nofb+2+r)/1000   # Inverse prior covariance matrix of betas
 
@@ -130,7 +140,7 @@ for i in range(1,(nofb+2)):
 M = burn + gibbs;		#number of iterations
 
 g=1
-while g <= M :       #Gibbs iterations
+#while g <= M :       #Gibbs iterations
     
 #Step 2:
 #----------
@@ -169,7 +179,7 @@ prob
 postki = np.argmax(multinomial(len(prob), pvals=prob))
 k[i] = postki + k[i-1] + 1
 
-#Step i
+# Step i
 #--------
 i = 3
 while i <= (nofb+1):			#over all possible break regimes
@@ -198,7 +208,6 @@ while i <= (nofb+1):			#over all possible break regimes
 
   prob = np.exp(prob-np.max(prob))  	 #likelihood values (strictly increasing transformation)     		
   prob = prob/np.sum(prob)	
-  prob
 
 # Draw k_i from multinom. cond. posterior and set new upper margin
 #-------------------------------------------------------------------#				     
@@ -240,7 +249,7 @@ sigma2in = np.linalg.inv(sigma*sigma)
 #k = c(1, k[-c(1,length(k))] + r, k[length(k)]);     # Correct break dates for lagging
 
 
-
+"""
 
 
 
